@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ user.first_name }} için Veri Ekle</title>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        $(function() {
+            $("#id_tarih").datepicker({
+                dateFormat: "yy-mm-dd"
+            });
+        });
+    </script>
+</head>
+<body>
+    <h2>{{ user.first_name }} için Veri Ekle</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Kaydet</button>
+    </form>
+
+    <h3>Veri Filtrele</h3>
+    <form method="get">
+        {{ filter_form.as_p }}
+        <button type="submit">Filtrele</button>
+    </form>
+
+    <h3>Mevcut Veriler</h3>
+    <table border="1">
+        <tr>
+            <th>Tip</th>
+            <th>Cins</th>
+            <th>Miktar</th>
+            <th>Milyem/cm</th>
+            <th>Birim</th>
+            <th>Alt Toplam</th>
+            <th>Açıklama</th>
+            <th>Adet</th>
+            <th>İşçilik</th>
+            <th>mm/cm</th>
+            <th>İşç. Toplam</th>
+            <th>İşlem Tipi</th>
+            <th>Tarih</th>
+            <th>Düzenle</th>
+            <th>Sil</th>
+        </tr>
+        {% for veri in user.kuyumcu_kullanicilar.all %}
+        <tr>
+            <td>{{ veri.tip }}</td>
+            <td>{{ veri.cins }}</td>
+            <td>{{ veri.miktar }}</td>
+            <td>{{ veri.milyem_per_cm }}</td>
+            <td>{{ veri.birim }}</td>
+            <td>{{ veri.alt_toplam }}</td>
+            <td>{{ veri.aciklama }}</td>
+            <td>{{ veri.adet }}</td>
+            <td>{{ veri.iscilik }}</td>
+            <td>{{ veri.mm_per_cm }}</td>
+            <td>{{ veri.isc_toplam }}</td>
+            <td>{{ veri.islem_tipi }}</td>
+            <td>{{ veri.tarih|date:"M d, Y" }}</td>
+            <td><a href="{% url 'accounts:kullanici_veri_duzenle' veri.id %}">Düzenle</a></td>
+            <td><button type="button" onclick="openModal('{{ veri.id }}')">Sil</button></td>
+        </tr>
+        {% endfor %}
+    </table>
+    <a href="{% url 'accounts:all_user_list' %}">Geri Dön</a>
+
+    <!-- Modal -->
+    <div id="modal" style="display:none;">
+        <div style="background-color:white; padding:20px; border:1px solid black;">
+            <p>Bu veriyi silmek istediğinizden emin misiniz?</p>
+            <a id="confirm-delete" href="">Evet</a>
+            <button type="button" onclick="closeModal()">Hayır</button>
+        </div>
+    </div>
+
+    <script>
+        function openModal(veriId) {
+            document.getElementById('confirm-delete').href = '{% url "accounts:kullanici_veri_sil" 0 %}'.replace('0', veriId);
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
